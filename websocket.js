@@ -327,7 +327,7 @@ module.exports = function(RED) {
     WebSocketListenerNode.prototype.handleOpenCloseEvent = function(id,/*socket*/socket,/*String*/event,) {
 
         var msg;
-        msg = {payload : event};
+        msg = {"event" : event};
         msg._session = {type:"websocket",id:id};
         for (var i = 0; i < this._openNodes.length; i++) {
             this._openNodes[i].send(msg);
