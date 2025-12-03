@@ -1,0 +1,25 @@
+{
+  "name": "node-red-contrib-websocket-server",
+  "version": "0.0.1",
+  "description": "websocket test with websocket open/close event information",
+  "keywords": [
+    "websocket",
+    "open/close",
+    "server"
+  ],
+  "license": "ISC",
+  "author": "Peter Durfina",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peterko18/node-red-contrib-websocket-server"
+  },
+  "main": "websocket.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "node-red" : {
+        "nodes": {
+            "websockets": "websocket.js"
+        }
+  }
+}

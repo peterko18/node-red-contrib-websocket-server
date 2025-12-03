@@ -1,0 +1,388 @@
+<!--
+  Copyright JS Foundation and other contributors, http://js.foundation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!-- WebSocket Input Node -->
+<script type="text/html" data-template-name="websocket_in">
+    <div class="form-row" id="websocket_server-row">
+        <label for="node-input-server"><i class="fa fa-bookmark"></i> <span>Path</span></label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name" name="Name">
+    </div>
+</script>
+
+<script type="text/javascript">
+
+(function() {
+
+    const headerTypes = [
+        /*
+        { value: "Accept", label: "Accept", hasValue: false },
+        { value: "Accept-Encoding", label: "Accept-Encoding", hasValue: false },
+        { value: "Accept-Language", label: "Accept-Language", hasValue: false },
+        */
+        { value: "Authorization", label: "Authorization", hasValue: false },
+        /*
+        { value: "Content-Type", label: "Content-Type", hasValue: false },
+        { value: "Cache-Control", label: "Cache-Control", hasValue: false },
+        */
+        { value: "User-Agent", label: "User-Agent", hasValue: false },
+        /*
+        { value: "Location", label: "Location", hasValue: false },
+        */
+        { value: "other", label: RED._("other"),
+          hasValue: true, icon: "red/images/typedInput/az.svg" },
+    ]
+
+    const headerOptions = {};
+    const defaultOptions = [
+        { value: "other", label: RED._("other"),
+          hasValue: true, icon: "red/images/typedInput/az.svg" },
+        "env",
+    ];
+    /*
+    headerOptions["accept"] = [
+        { value: "text/plain", label: "text/plain", hasValue: false },
+        { value: "text/html", label: "text/html", hasValue: false },
+        { value: "application/json", label: "application/json", hasValue: false },
+        { value: "application/xml", label: "application/xml", hasValue: false },
+        ...defaultOptions,
+    ];
+    
+    headerOptions["accept-encoding"] = [
+        { value: "gzip", label: "gzip", hasValue: false },
+        { value: "deflate", label: "deflate", hasValue: false },
+        { value: "compress", label: "compress", hasValue: false },
+        { value: "br", label: "br", hasValue: false },
+        { value: "gzip, deflate", label: "gzip, deflate", hasValue: false },
+        { value: "gzip, deflate, br", label: "gzip, deflate, br", hasValue: false },
+        ...defaultOptions,
+    ];
+    headerOptions["accept-language"] = [
+        { value: "*", label: "*", hasValue: false },
+        { value: "en-GB, en-US, en;q=0.9", label: "en-GB, en-US, en;q=0.9", hasValue: false },
+        { value: "de-AT, de-DE;q=0.9, en;q=0.5", label: "de-AT, de-DE;q=0.9, en;q=0.5", hasValue: false },
+        { value: "es-mx,es,en;q=0.5", label: "es-mx,es,en;q=0.5", hasValue: false },
+        { value: "fr-CH, fr;q=0.9, en;q=0.8", label: "fr-CH, fr;q=0.9, en;q=0.8", hasValue: false },
+        { value: "zh-CN, zh-TW; q = 0.9, zh-HK; q = 0.8, zh; q = 0.7, en; q = 0.6", label: "zh-CN, zh-TW; q = 0.9, zh-HK; q = 0.8, zh; q = 0.7, en; q = 0.6", hasValue: false },
+        { value: "ja-JP, jp", label: "ja-JP, jp", hasValue: false },
+        ...defaultOptions,
+    ];
+    headerOptions["content-type"] = [
+        { value: "text/css", label: "text/css", hasValue: false },
+        { value: "text/plain", label: "text/plain", hasValue: false },
+        { value: "text/html", label: "text/html", hasValue: false },
+        { value: "application/json", label: "application/json", hasValue: false },
+        { value: "application/octet-stream", label: "application/octet-stream", hasValue: false },
+        { value: "application/pdf", label: "application/pdf", hasValue: false },
+        { value: "application/xml", label: "application/xml", hasValue: false },
+        { value: "application/zip", label: "application/zip", hasValue: false },
+        { value: "multipart/form-data", label: "multipart/form-data", hasValue: false },
+        { value: "audio/aac", label: "audio/aac", hasValue: false },
+        { value: "audio/ac3", label: "audio/ac3", hasValue: false },
+        { value: "audio/basic", label: "audio/basic", hasValue: false },
+        { value: "audio/mp4", label: "audio/mp4", hasValue: false },
+        { value: "audio/ogg", label: "audio/ogg", hasValue: false },
+        { value: "image/bmp", label: "image/bmp", hasValue: false },
+        { value: "image/gif", label: "image/gif", hasValue: false },
+        { value: "image/jpeg", label: "image/jpeg", hasValue: false },
+        { value: "image/png", label: "image/png", hasValue: false },
+        { value: "image/tiff", label: "image/tiff", hasValue: false },
+        ...defaultOptions,
+    ];
+    headerOptions["cache-control"] = [
+        { value: "max-age=0", label: "max-age=0", hasValue: false },
+        { value: "max-age=86400", label: "max-age=86400", hasValue: false },
+        { value: "no-cache", label: "no-cache", hasValue: false },
+        ...defaultOptions,
+    ];
+    */
+    headerOptions["user-agent"] = [
+        { value: "Mozilla/5.0", label: "Mozilla/5.0", hasValue: false },
+        ...defaultOptions,
+    ];
+
+    function getHeaderOptions(headerName) {
+        const lc = (headerName || "").toLowerCase();
+        let opts = headerOptions[lc];
+        return opts || defaultOptions;
+    }
+
+    function ws_label() {
+        var nodeid = (this.client)?this.client:this.server;
+        var wsNode = RED.nodes.node(nodeid);
+        return this.name||(wsNode?"[ws] "+wsNode.label():"websocket");
+    }
+
+    function ws_validateserver() {
+        if ($("#node-input-mode").val() === 'client' || (this.client && !this.server)) {
+            return true;
+        }
+        else {
+            if (RED.nodes.node(this.server) != null) {
+                return true;
+            }
+            return RED._("Missing server configuration");
+        }
+    }
+
+
+    RED.nodes.registerType('websocket_Open/Close',{
+        category: 'websocket server',
+        defaults: {
+            name: {value:""},
+            server: {type:"websocket_server", validate: ws_validateserver}
+        },
+        color:"rgb(252, 93, 53)",
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.svg",
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        label: ws_label
+    });
+
+    RED.nodes.registerType('websocket_Drop',{
+        category: 'websocket server',
+        defaults: {
+            name: {value:""},
+            server: {type:"websocket_server", validate: ws_validateserver}
+        },
+        color:"rgb(252, 93, 53)",
+        inputs:1,
+        outputs:0,
+        icon: "white-globe.svg",
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        label: ws_label
+    });
+
+    RED.nodes.registerType('websocket_in',{
+        category: 'websocket server',
+        defaults: {
+            name: {value:""},
+            server: {type:"websocket_server", validate: ws_validateserver}
+        },
+        color:"rgb(252, 93, 53)",
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.svg",
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        label: ws_label
+    });
+
+    RED.nodes.registerType('websocket_out',{
+        category: 'websocket server',
+        defaults: {
+            name: {value:""},
+            server: {type:"websocket_server", validate: ws_validateserver}
+        },
+        color:"rgb(252, 93, 53)",
+        inputs:1,
+        outputs:0,
+        icon: "white-globe.svg",
+        align: "right",
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        label: ws_label,
+    });
+
+    RED.nodes.registerType('websocket_server',{
+        category: 'config',
+        defaults: {
+            path: {value:"",required:true,
+                   label:RED._("Path"),
+                   validate:RED.validators.regex(/^((?!\/debug\/ws).)*$/)},
+            wholemsg: {value:"false"},
+            pingaction: {value:"none"},
+            hb: {
+                value: "1",
+                label:RED._("Send heartbeat"),
+                validate: RED.validators.number() }
+        },
+        inputs:0,
+        outputs:0,
+        label: function() {
+            var root = RED.settings.httpNodeRoot;
+            if (root.slice(-1) != "/") {
+                root = root+"/";
+            }
+            if (this.path) {
+                if (this.path.charAt(0) == "/") {
+                    root += this.path.slice(1);
+                } else {
+                    root += this.path;
+                }
+            }
+            return root;
+        },
+        oneditprepare: function() {
+            var root = RED.settings.httpNodeRoot;
+            if (root.slice(-1) == "/") {
+                root = root.slice(0,-1);
+            }
+            if (root === "") {
+                $("#node-config-ws-tip").hide();
+            } else {
+                $("#node-config-ws-path").html(RED._("This path will be relative to <code>__path__</code>.", { path: root }));
+                $("#node-config-ws-tip").show();
+            }
+            var ping = this.pingaction.value;
+            if (ping === 'none'){
+                $("#node-config-pingoption").hide();
+            }
+            else {
+                if (ping === 'send'){
+                    $("#node-config-input-pingaction option[value=send]").prop('selected', true)
+                }
+                else if (ping === 'receive'){
+                    $("#node-config-input-pingaction option[value=receive]").prop('selected', true)
+                }
+                $("#node-config-pingoption").show();
+            }
+            
+            $("#node-config-input-pingaction").on("change", function() {
+                if ( $("#node-config-input-pingaction").val() === 'none') {
+                    $("#node-config-pingoption").hide();
+                }
+                else {
+                    if ($("#node-config-input-pingaction").val() === 'send'){
+                        $("#node-config-input-hb-row").text("Send ping interval");
+                    }
+                    else {
+                        $("#node-config-input-hb-row").text("Receive ping timeout");
+                    }
+                    $("#node-config-pingoption").show();
+                }
+            });
+
+           if (this.pingaction !== "none"){
+                if (this.pingaction == "send"){
+                        $("#node-config-input-hb-row").text("Send ping interval");
+                }
+                else{
+                        $("#node-config-input-hb-row").text("Receive ping timeout");
+                }
+                $("#node-config-pingoption").show();
+            }
+
+            $("#node-config-input-hb").on("change", function() {
+                if ( $("#node-config-input-hb").val() == "0") {
+                    $("#node-config-input-hb").val("1");
+                }
+            });
+        },
+
+        oneditresize: function(size) {
+            const dlg = $("#dialog-form");
+            const expandRow = dlg.find('.node-input-headers-container-row');
+            let height = dlg.height() - 5;
+            if(expandRow && expandRow.length){
+                const siblingRows = dlg.find('> .form-row:not(.node-input-headers-container-row)');
+                for (let i = 0; i < siblingRows.size(); i++) {
+                    const cr = $(siblingRows[i]);
+                    if(cr.is(":visible"))
+                        height -= cr.outerHeight(true);
+                }
+                $("#node-input-headers-container").editableList('height',height);
+            } 
+        }
+    });
+})();
+
+
+</script>
+
+<!-- WebSocket out Node -->
+<script type="text/html" data-template-name="websocket_out">
+    <div class="form-row" id="websocket_server-row">
+        <label for="node-input-server"><i class="fa fa-bookmark"></i> <span>Path</span></label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name" name="Name">
+    </div>
+</script>
+
+<!-- WebSocket Server configuration node -->
+<script type="text/html" data-template-name="websocket_server">
+    <div class="form-row">
+        <label for="node-config-input-path"><i class="fa fa-bookmark"></i> <span>Path</span></label>
+        <input id="node-config-input-path" type="text" placeholder="/ws/example">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-wholemsg">Send/Receive</label>
+        <select type="text" id="node-config-input-wholemsg" style="width: 70%;">
+            <option value="false">Payload</option>
+            <option value="true">Entire message</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-pingaction">Ping Action</label>
+        <select type="text" id="node-config-input-pingaction" style="width: 70%;">
+            <option value="none">None</option>
+            <option value="send">Send ping</option>
+            <option value="receive">Receive ping</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-config-pingoption" style="display: flex; align-items: center; min-height: 34px">
+        <span id="node-config-input-hb-row" style="margin: 0 8px; width:auto">Send ping</span>
+        <span id="node-config-input-hb-row">
+            <input type="number" style="width: 70px; margin-right: 3px" id="node-config-input-hb" min="1" value="1">
+            <span>seconds</span>
+        </span>
+    </div>
+    <div class="form-tips">
+        <span>By default, &ltcode&gtpayload&lt/code&gt will contain the data to be sent over, or received from a websocket. The listener can be configured to send or receive the entire message object as a JSON formatted string.</span>
+        <p id="node-config-ws-tip"><span id="node-config-ws-path"></span></p>
+        <span id="test"></span>
+    </div>
+</script>
+
+<!-- WebSocket open Node -->
+<script type="text/html" data-template-name="websocket_Open/Close">
+
+    <div class="form-row" id="websocket_server-row">
+        <label for="node-input-server"><i class="fa fa-bookmark"></i> <span>Path</span></label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name" name="Name">
+    </div>
+</script>
+
+<script type="text/html" data-template-name="websocket_Drop">
+
+    <div class="form-row" id="websocket_server-row">
+        <label for="node-input-server"><i class="fa fa-bookmark"></i> <span>Path</span></label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+        <input type="text" id="node-input-name" name="Name">
+    </div>
+</script>
+
