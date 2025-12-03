@@ -5,7 +5,8 @@
   "keywords": [
     "websocket",
     "open/close",
-    "server"
+    "server",
+    "node-red"
   ],
   "license": "ISC",
   "author": "Peter Durfina",
