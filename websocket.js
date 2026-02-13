@@ -516,17 +516,16 @@ module.exports = function(RED) {
                 }
             }
             if (payload) {
-                if (msg._session) {
+                if (msg.hasOwnProperty("_session")) {
                     if (Array.isArray(msg._session))
                     {
-                        for (var i = 0; i <  msg._session.lenght; i++)
-                        {
-                            node.serverConfig.reply(msg._session[i],payload);
-                        }
+                        msg._session.forEach(function(sessionId){
+                            node.serverConfig.reply(sessionId,payload);
+                        });
                     }
                     else
                     {
-                        node.serverConfig.reply(msg._session.id,payload);
+                        node.serverConfig.reply(msg._session,payload);
                     }
                 } else {
                     node.serverConfig.broadcast(payload,function(error) {
