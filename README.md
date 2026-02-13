@@ -42,6 +42,11 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 #### Websocket_out - node for send websocket messages
 - Path - You can connect it to already existing server Path or create new server 
 - Name - Optional Node Name
+  #### Input - require msg object with `.payload`
+  Optional - msg._session
+  - to send message to group of clients msg._session = [client1_id, client2_id, ...]
+  - to send message to one client msg._session = client_id
+  - if no msg_session, message is sent to all connected clients
 #### Websocket_Open/Close - Information node about connection status 
 - Path - You can connect it to already existing server Path or create new server 
 - Name - Optional Node Name
