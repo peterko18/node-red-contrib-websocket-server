@@ -138,6 +138,7 @@ module.exports = function(RED) {
             socket.nrPendingPong = false;
             node._clients[id] = socket;
             node.emit('opened',{count:Object.keys(node._clients).length,id:id});
+            //node.handleOpenCloseEvent(id,socket,'open');
             node.handleOpenCloseEvent(id,socket,'open');
 
 
@@ -328,6 +329,7 @@ module.exports = function(RED) {
 
         var msg;
         msg = {"event" : event};
+        //msg = {"ip" : socket. };
         msg._session = {type:"websocket",id:id};
         for (var i = 0; i < this._openNodes.length; i++) {
             this._openNodes[i].send(msg);
@@ -514,8 +516,18 @@ module.exports = function(RED) {
                 }
             }
             if (payload) {
-                if (msg._session && msg._session.type == "websocket") {
-                    node.serverConfig.reply(msg._session.id,payload);
+                if (msg._session) {
+                    if (Array.isArray(msg._session))
+                    {
+                        for (var i = 0; i <  msg._session.lenght; i++)
+                        {
+                            node.serverConfig.reply(msg._session[i],payload);
+                        }
+                    }
+                    else
+                    {
+                        node.serverConfig.reply(msg._session.id,payload);
+                    }
                 } else {
                     node.serverConfig.broadcast(payload,function(error) {
                         if (!!error) {

@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-websocket-server",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "websocket test with websocket open/close event information",
   "keywords": [
     "websocket",
@@ -18,9 +18,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "node-red" : {
-        "nodes": {
-            "websockets": "websocket.js"
-        }
+  "node-red": {
+    "nodes": {
+      "websockets": "websocket.js"
+    }
   }
 }
