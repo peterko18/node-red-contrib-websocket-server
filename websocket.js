@@ -525,7 +525,14 @@ module.exports = function(RED) {
                     }
                     else
                     {
-                        node.serverConfig.reply(msg._session,payload);
+                        if (msg._session.hasOwnProperty("id"))
+                        {
+                            node.serverConfig.reply(msg._session.id,payload);
+                        }
+                        else
+                        {
+                            node.serverConfig.reply(msg._session,payload);
+                        }
                     }
                 } else {
                     node.serverConfig.broadcast(payload,function(error) {
